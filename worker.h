@@ -23,9 +23,9 @@ public:
     int interval;
 
     QJsonObject ObjectFromString(QString in);
-    void parse_kureyGeo(QJsonObject obj);
-    void parse_imaniPrima(QJsonObject obj);
-    void parse(QJsonObject obj);
+//    void parse_kureyGeo(QJsonObject obj);
+//    void parse_imaniPrima(QJsonObject obj);
+    void parse(QJsonObject obj, int index);
 public slots:
     void doWork();
 };

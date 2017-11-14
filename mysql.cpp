@@ -87,13 +87,13 @@ void mysql::write(QSqlDatabase db, QString query, QStringList parameter)
             db.open();
         }
         QSqlQuery q(QSqlDatabase::database(db.connectionName()));
-//        qDebug() << query;
-//        q.prepare(query);
         for (int i = 0; i < parameter.length(); i++) {
             if (query.indexOf(":p"+QString::number(i+1)) > 0) {
                 query.replace(":p"+QString::number(i+1), "'"+parameter.at(i)+"'");
             }
         }
+        qDebug() << query;
+//        q.prepare(query);
         if (q.exec(query)) {
 //            while(q.next()) {
 //                 result.append(q.value(0).toString());
