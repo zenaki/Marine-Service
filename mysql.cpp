@@ -70,10 +70,13 @@ QStringList mysql::read(QSqlDatabase db, QString query, QStringList parameter)
         }
         if (q.exec(query)) {
             while(q.next()) {
-                 result.append(q.value(0).toString());
+                for (int i = 0; i < q.record().count(); i++) {
+                    result.append(q.value(i).toString());
+                }
             }
         } else {
-            qDebug() << "Cannot read from database with query: \n" << query;
+//            qDebug() << "Cannot read from database with query: \n" << query;
+            qDebug() << "Cannot read from database";
         }
         db.close();
     }
@@ -92,7 +95,7 @@ void mysql::write(QSqlDatabase db, QString query, QStringList parameter)
                 query.replace(":p"+QString::number(i+1), "'"+parameter.at(i)+"'");
             }
         }
-        qDebug() << query;
+//        qDebug() << query;
 //        q.prepare(query);
         if (q.exec(query)) {
 //            while(q.next()) {
@@ -100,6 +103,7 @@ void mysql::write(QSqlDatabase db, QString query, QStringList parameter)
 //            }
         } else {
             qDebug() << "Cannot write to database with query: \n" << query;
+//            qDebug() << "Cannot write to database";
         }
         db.close();
     }

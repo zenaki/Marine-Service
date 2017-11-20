@@ -8,6 +8,7 @@
 #include <QSqlError>
 #include <QSqlDatabase>
 #include <QSqlQuery>
+#include <QSqlRecord>
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -32,6 +33,7 @@ struct ship{
     int id_ship;
     char name[32];
     char modem_id[32];
+    QStringList titik_ukur;
 };
 
 struct utama{
