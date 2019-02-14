@@ -2,9 +2,13 @@
 #define WORKER_H
 
 #include <QObject>
+#include <QCryptographicHash>
 
 #include "config.h"
 #include "mysql.h"
+
+//#include "qttpserver"
+//#include "api.h"
 
 class worker : public QObject
 {
@@ -26,6 +30,8 @@ public:
 //    void parse_kureyGeo(QJsonObject obj);
 //    void parse_imaniPrima(QJsonObject obj);
     void parse(QJsonObject obj, int index);
+
+//    qttp::HttpServer* httpSvr;
 public slots:
     void doWork();
 };

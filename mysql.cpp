@@ -75,15 +75,15 @@ QStringList mysql::read(QSqlDatabase db, QString query, QStringList parameter)
                 }
             }
         } else {
-//            qDebug() << "Cannot read from database with query: \n" << query;
-            qDebug() << "Cannot read from database";
+            qDebug() << "Cannot read from database with query: \n" << query;
+//            qDebug() << "Cannot read from database";
         }
         db.close();
     }
     return result;
 }
 
-void mysql::write(QSqlDatabase db, QString query, QStringList parameter)
+void mysql:: write(QSqlDatabase db, QString query, QStringList parameter)
 {
     if (db.isValid()) {
         if (!db.isOpen()) {
@@ -98,11 +98,13 @@ void mysql::write(QSqlDatabase db, QString query, QStringList parameter)
 //        qDebug() << query;
 //        q.prepare(query);
         if (q.exec(query)) {
+            qDebug() << QDateTime::currentDateTime().toString("dd-MM-yyyy HH:mm:ss:zzz") + "::Success write to database";
+//            qDebug() << QDateTime::currentDateTime().toString("dd-MM-yyyy HH:mm:ss:zzz") + "::Success write to database with query: \n" << query;
 //            while(q.next()) {
 //                 result.append(q.value(0).toString());
 //            }
         } else {
-            qDebug() << "Cannot write to database with query: \n" << query;
+            qDebug() << QDateTime::currentDateTime().toString("dd-MM-yyyy HH:mm:ss:zzz") + "::Cannot write to database with query: \n" << query;
 //            qDebug() << "Cannot write to database";
         }
         db.close();
@@ -149,11 +151,10 @@ void mysql::modem_getway(QSqlDatabase db, account *acc)
         if (!db.isOpen()) {
             db.open();
         }
-
         QSqlQuery q(QSqlDatabase::database(db.connectionName()));
         int n = 0;
 
-        q.prepare("SELECT id, url, access_id, password, next_utc, SIN, MIN from gateway");
+        q.prepare("SELECT id, url, access_id, password, next_utc, SIN, MIN, config from gateway");
         if (!q.exec()) {
             printf("Initialization                                          [FAILED]");
         } else {
@@ -167,6 +168,7 @@ void mysql::modem_getway(QSqlDatabase db, account *acc)
                 QDateTime nextutc = q.value(4).toDateTime();
                 int SIN = q.value(5).toInt();
                 int MIN = q.value(6).toInt();
+                QString SinMin = q.value(7).toString();
 
                 qStr.sprintf("%s?access_id=%s&password=%s&start_utc=",
                              getway.toUtf8().data(),
@@ -181,11 +183,47 @@ void mysql::modem_getway(QSqlDatabase db, account *acc)
                 strcpy(acc->gway[n].nextutc, nextutc.toString("yyyy-MM-dd%20hh:mm:ss").toUtf8().data());
                 acc->gway[n].SIN = SIN;
                 acc->gway[n].MIN = MIN;
-
+                strcpy(acc->gway[n].SinMin, SinMin.toLatin1());
                 n++;
+
+                qDebug() << "----------------------------------------";
+                qDebug() << "GateWay ID         : " << id;
+                qDebug() << "GateWay Address    : " << getway;
+                qDebug() << "Access ID          : " << access_id;
+                qDebug() << "Password           : " << password;
+                qDebug() << "Next UTC           : " << nextutc;
+                qDebug() << "SIN                : " << SIN;
+                qDebug() << "MIN                : " << MIN;
+                qDebug() << "SIN & MIN          : " << SinMin;
+                qDebug() << "----------------------------------------";
             }
         }
 
         acc->sum_getway = n;
     }
+}
+
+bool mysql::check_table_is_available(QSqlDatabase db, QString date)
+{
+    QString query;
+
+    query.clear();
+    query = "select * from data_" + date;
+
+    QSqlQuery q(QSqlDatabase::database(db.connectionName()));
+    q.prepare(query);
+
+    return q.exec();
+}
+
+void mysql::create_tabel_data_harian(QSqlDatabase db, QString date)
+{
+    QString query;
+
+    query.clear();
+    query = "CREATE TABLE if not exists data_"+date+" \
+             (id_titik_ukur INT NOT NULL, value FLOAT NOT NULL, id_trip INT NULL DEFAULT NULL, \
+             epochtime INT NOT NULL, data_time DATETIME NOT NULL, flag_data INT, PRIMARY KEY (id_titik_ukur, data_time))";
+    QSqlQuery q(QSqlDatabase::database(db.connectionName()));
+    q.exec(query);
 }

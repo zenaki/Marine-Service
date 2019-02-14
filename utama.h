@@ -29,6 +29,9 @@
 #define PATH_CONFIGURATION_BIN  ".MarineConfig/marine-cfg.dat"
 #define PATH_MONITA             ".MarineConfig/"
 
+#define  FLAG_ENGINE_DATA      0
+#define  FLAG_TRACKING_DATA    1
+
 struct ship{
     int id_ship;
     char name[32];
@@ -50,6 +53,7 @@ struct getway{
     char nextutc[32];
     int SIN;
     int MIN;
+    char SinMin[512];
 };
 
 struct account{
